@@ -1,0 +1,45 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+format = "$all$directory$character"
+
+[character]
+success_symbol = '[\$](bright-black)'
+error_symbol = '[\$](red)'
+
+[directory]
+style = "cyan"
+
+[git_branch]
+format = "[$branch]($style) "
+style = "purple"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
+
+[git_status]
+conflicted = '≠'
+style = "bright-blue"
+
+[python]
+format = "[($symbol$virtualenv )]($style)"
+style = "green"
+symbol = " "
+
+# Disabled
+[aws]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[line_break]
+disabled = false
+
+[nodejs]
+disabled = true
+
+[package]
+disabled = true
+
+[ruby]
+disabled = true

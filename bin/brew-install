@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+
+sudo cat /dev/null
+
+brew update-reset
+brew bundle cleanup --force
+brew bundle --no-upgrade
+brew cleanup --prune=30
+brew upgrade
+brew cu --all --yes --no-brew-update
+brew cu --force --yes --no-brew-update
+/usr/bin/qlmanage -r

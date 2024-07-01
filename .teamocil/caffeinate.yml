@@ -1,0 +1,7 @@
+name: "general"
+windows:
+  - name: caffeinate
+    root: ~/
+    panes:
+      - commands:
+          - caffeinate -u -t 5400
