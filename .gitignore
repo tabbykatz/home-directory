@@ -1,0 +1,21 @@
+# Personal data directories - never commit
+# Note: Specific directory names are configured during setup
+# Common examples: logs/, work/, personal/, social/, growth/
+logs/
+work/
+personal/
+social/
+growth/
+
+# Assistant configuration files (contain personal details)
+.assistant-config.json
+.assistant-env
+.assistant-env.template
+
+# Personal configuration directories (symlinked from home)
+~/.config/
+
+# Sensitive files
+*.json.local
+**/secrets.json
+**/*-private.json

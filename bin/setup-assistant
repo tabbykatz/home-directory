@@ -1,0 +1,270 @@
+#!/bin/bash
+
+# Claude Code Assistant Setup Script
+# Configures personalized directories for work logging, performance tracking, and personal management
+
+set -e
+
+echo "🤖 Claude Code Assistant Setup"
+echo "==============================="
+echo ""
+echo "This script will help you configure your personal productivity directories."
+echo "All data will be stored locally and never committed to git."
+echo ""
+
+# Check if we're in the right directory
+if [[ ! -f "CLAUDE.md" ]]; then
+    echo "❌ Error: Please run this script from the root of your claude-assistant repository"
+    exit 1
+fi
+
+echo "📁 Directory Configuration"
+echo "=========================="
+echo ""
+
+# Work/Journal directory
+echo "1. Work & Daily Logging Directory"
+echo "   This will store your daily work logs, tasks, tickets, and project tracking."
+echo ""
+echo "   Suggested names:"
+echo "   • logs - Work and project logs (recommended)"
+echo "   • work - Generic work logging"
+echo "   • journal - Personal work journal"  
+echo "   • daily - Daily logging and notes"
+echo "   • Or enter your company name (e.g., 'mycompany')"
+echo ""
+read -p "   Enter directory name [logs]: " WORK_DIR
+WORK_DIR=${WORK_DIR:-logs}
+
+# Performance/Growth directory  
+echo ""
+echo "2. Performance & Growth Tracking Directory"
+echo "   This will store performance reviews, screenshots, metrics, and career development."
+echo ""
+echo "   Suggested names:"
+echo "   • growth - Personal and professional growth (recommended)"
+echo "   • career - Career development and tracking"
+echo "   • performance - Performance reviews and metrics"  
+echo "   • development - Professional development"
+echo ""
+read -p "   Enter directory name [growth]: " PERF_DIR
+PERF_DIR=${PERF_DIR:-growth}
+
+# Personal/Social directory
+echo ""
+echo "3. Personal & Social Management Directory"
+echo "   This will store contact tracking and personal relationship management."
+echo ""
+echo "   Suggested names:"
+echo "   • social - Social connections and contacts (recommended)"
+echo "   • personal - Personal management"
+echo "   • contacts - Contact and relationship tracking"
+echo "   • relationships - Relationship management"
+echo ""
+read -p "   Enter directory name [social]: " PERSONAL_DIR
+PERSONAL_DIR=${PERSONAL_DIR:-social}
+
+echo ""
+echo "🔐 Atlassian Integration (Optional)"
+echo "=================================="
+echo "If you use Jira/Confluence, provide your Atlassian details for integration."
+echo "Leave blank to skip and configure later."
+echo ""
+
+read -p "Your full name (for Jira comments) [skip]: " USER_NAME
+read -p "Your work email [skip]: " USER_EMAIL
+read -p "Atlassian Cloud ID (from your Atlassian URL) [skip]: " CLOUD_ID
+read -p "Your Atlassian Account ID [skip]: " ACCOUNT_ID
+read -p "Company/Organization name [skip]: " COMPANY_NAME
+
+echo ""
+echo "📋 Configuration Summary"
+echo "======================="
+echo "Work/Journal Directory: $WORK_DIR/"
+echo "Performance/Growth Directory: $PERF_DIR/"  
+echo "Personal/Social Directory: $PERSONAL_DIR/"
+
+if [[ -n "$USER_NAME" ]]; then
+  echo "User: $USER_NAME ($USER_EMAIL)"
+  echo "Organization: $COMPANY_NAME"
+  echo "Atlassian Cloud ID: $CLOUD_ID"
+fi
+
+echo ""
+read -p "Continue with setup? (y/N): " CONFIRM
+
+if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+    echo "Setup cancelled."
+    exit 0
+fi
+
+echo ""
+echo "🔧 Creating directories and configuration..."
+
+# Create directories
+mkdir -p "$WORK_DIR"
+mkdir -p "$PERF_DIR"/{documents/screenshots_for_perf,metrics,templates,annual-reviews,promotions,self-assessments,compensation}
+mkdir -p "$PERSONAL_DIR"
+
+# Create initial data files
+echo '{"entries": [], "projects": [], "meetings": [], "learning": [], "goals": []}' > "$WORK_DIR/work-log.json"
+echo '{"friends": []}' > "$PERSONAL_DIR/friends.json"
+echo '{"performance_data": [], "quarterly_goals": [], "achievements": [], "feedback": []}' > "$PERF_DIR/metrics/performance-tracking.json"
+
+# Create templates
+cat > "$PERF_DIR/templates/quarterly-goals-template.md" << 'EOF'
+# Quarterly Goals - Q[X] [YEAR]
+
+## Professional Goals
+- Goal 1: [Description]
+  - Key Result 1: [Measurable outcome]
+  - Key Result 2: [Measurable outcome]
+  
+## Personal Development Goals
+- Goal 1: [Description]
+  - Key Result 1: [Measurable outcome]
+
+## Notes
+- [Any additional context or notes]
+EOF
+
+cat > "$PERF_DIR/templates/self-assessment-template.md" << 'EOF'
+# Self-Assessment - [Period]
+
+## Key Achievements
+- [Achievement 1 with quantifiable impact]
+- [Achievement 2 with quantifiable impact]
+
+## Goals Progress  
+- [Goal 1]: [Status and progress description]
+- [Goal 2]: [Status and progress description]
+
+## Areas of Growth
+- [Area 1]: [What you learned/improved]
+- [Area 2]: [What you learned/improved]
+
+## Future Focus
+- [Priority 1 for next period]
+- [Priority 2 for next period]
+EOF
+
+cat > "$PERF_DIR/templates/screenshot-workflow.md" << 'EOF'
+# Screenshot Evidence Workflow
+
+## File Naming Convention
+`YYYY-MM-DD_[type]_[description].png`
+
+## Types
+- `kudos` - Recognition or praise received
+- `metric` - Performance metrics or dashboards  
+- `post` - Social posts or articles
+- `demo` - Product demos or presentations
+- `incident` - Incident response or problem solving
+- `collab` - Collaboration examples
+- `doc` - Documentation or technical writing
+- `learning` - Certifications or learning achievements
+
+## Example Filenames
+- `2024-03-15_kudos_client-feedback-excellent-support.png`
+- `2024-03-15_metric_reduced-query-time-50percent.png`
+- `2024-03-15_demo_new-feature-presentation.png`
+
+## Process
+1. Take screenshot
+2. Rename using convention above
+3. Save to `documents/screenshots_for_perf/`  
+4. Add entry to `metrics/performance-tracking.json` if significant
+5. Reference in work log entry
+EOF
+
+# Create configuration file
+cat > ".assistant-config.json" << EOF
+{
+  "directories": {
+    "work": "$WORK_DIR",
+    "performance": "$PERF_DIR", 
+    "personal": "$PERSONAL_DIR"
+  },
+  "created_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "version": "1.0"
+}
+EOF
+
+# Create environment file for Atlassian integration
+if [[ -n "$USER_NAME" ]]; then
+cat > ".assistant-env" << EOF
+# Atlassian Integration Configuration
+# This file contains your personal Atlassian credentials and details
+# It is automatically gitignored to keep your information private
+
+export ASSISTANT_USER_NAME="$USER_NAME"
+export ASSISTANT_USER_EMAIL="$USER_EMAIL"
+export ASSISTANT_COMPANY_NAME="$COMPANY_NAME"
+export ASSISTANT_ATLASSIAN_CLOUD_ID="$CLOUD_ID"
+export ASSISTANT_ATLASSIAN_ACCOUNT_ID="$ACCOUNT_ID"
+
+# Usage: The Claude assistant will reference these environment variables
+# in place of hardcoded personal details in the configuration files
+EOF
+
+echo "✅ Created .assistant-env with your Atlassian configuration"
+else
+cat > ".assistant-env.template" << 'EOF'
+# Atlassian Integration Configuration Template
+# Copy this to .assistant-env and fill in your details
+
+export ASSISTANT_USER_NAME="Your Full Name"
+export ASSISTANT_USER_EMAIL="your.email@company.com"
+export ASSISTANT_COMPANY_NAME="Your Company"
+export ASSISTANT_ATLASSIAN_CLOUD_ID="your-cloud-id-here"
+export ASSISTANT_ATLASSIAN_ACCOUNT_ID="your-account-id-here"
+
+# To find your Cloud ID:
+# 1. Go to your Atlassian site (e.g., yourcompany.atlassian.net)
+# 2. The Cloud ID is in the URL or can be found via Atlassian admin tools
+
+# To find your Account ID:
+# 1. Go to https://id.atlassian.com/manage-profile/profile-and-visibility
+# 2. Your Account ID is shown in the URL or profile section
+EOF
+
+echo "✅ Created .assistant-env.template - copy to .assistant-env when ready"
+fi
+
+# Update .gitignore
+if [[ -f ".gitignore" ]]; then
+    # Remove old entries
+    sed -i.bak '/^upstart\/$/d; /^perf\/$/d; /^personal\/$/d' .gitignore
+fi
+
+# Add new entries
+cat >> ".gitignore" << EOF
+
+# Personal data directories (auto-configured)
+$WORK_DIR/
+$PERF_DIR/
+$PERSONAL_DIR/
+
+# Assistant configuration files (contain personal details)
+.assistant-config.json
+.assistant-env
+.assistant-env.template
+EOF
+
+echo "✅ Setup complete!"
+echo ""
+echo "📁 Created directories:"
+echo "   • $WORK_DIR/ - Work logging and project tracking"
+echo "   • $PERF_DIR/ - Performance tracking and career development"  
+echo "   • $PERSONAL_DIR/ - Personal and social management"
+echo ""
+echo "📄 Created initial files:"
+echo "   • $WORK_DIR/work-log.json - Daily work logging data"
+echo "   • $PERSONAL_DIR/friends.json - Contact tracking data"
+echo "   • $PERF_DIR/metrics/performance-tracking.json - Performance data"
+echo "   • $PERF_DIR/templates/ - Assessment and goal templates"
+echo ""
+echo "🔒 Added directories to .gitignore - your data stays private"
+echo ""
+echo "🚀 You're ready to use Claude Code Assistant!"
+echo "   Try saying: 'log work' or 'contacts' to get started"

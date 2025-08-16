@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "reminders": {
+      "type": "stdio",
+      "command": "mcp-server-apple-reminders",
+      "args": [],
+      "env": {}
+    },
+    "browser": {
+      "type": "stdio",
+      "command": "mcp-server-browsermcp",
+      "args": [],
+      "env": {}
+    },
+    "jira": {
+      "type": "stdio",
+      "command": "mcp-remote",
+      "args": [
+        "https://mcp.atlassian.com/v1/sse"
+      ],
+      "env": {}
+    }
+  }
+}

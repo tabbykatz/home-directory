@@ -1,5 +1,0 @@
-name: "general"
-windows:
-  - name: general
-    layout: even-vertical
-    focus: true
