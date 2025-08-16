@@ -4,7 +4,7 @@ set -euo pipefail
 # Launch MacVim or vi depending on whether we're on a local Mac or in an SSH session
 if type nvim &>/dev/null; then
 	if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]] || [[ "$TERM_PROGRAM" == "tmux" ]]; then
-		exec open -a vimr "$@"
+		exec vimr --cur-env --nvim --wait "$@"
 	fi
 fi
 

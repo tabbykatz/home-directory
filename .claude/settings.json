@@ -1,0 +1,45 @@
+{
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(npx prettier:*)",
+      "Bash(pnpm:*)",
+      "Bash(prettier:*)",
+      "Bash(rg:*)",
+      "Bash(sqlfluff:*)",
+      "WebFetch(domain:anthropic.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:githubusercontent.com)",
+      "mcp__context7__get-library-docs",
+      "mcp__context7__resolve-library-id",
+      "mcp__probe__extract_code",
+      "mcp__probe__search_code"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(jq -r '.tool_input.file_path' /dev/stdin); prettier --write --ignore-unknown \"$(realpath \"$file\")\""
+          },
+          {
+            "type": "command",
+            "command": "file=$(jq -r '.tool_input.file_path' /dev/stdin); if [[ \"$file\" == *.sql ]]; then sqlfluff fix \"$(realpath \"$file\")\"; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1753925015835
+  }
+}
